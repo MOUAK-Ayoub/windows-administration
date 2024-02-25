@@ -1,4 +1,4 @@
-terraform/win_key.pem
 terraform/.terraform/*
 .gitignore
 terraform/.terraform.lock.hcl
+terraform/files/win_key.pem

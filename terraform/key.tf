@@ -5,7 +5,7 @@ resource "tls_private_key" "key" {
 
 resource "local_file" "key" {
   content  = tls_private_key.key.private_key_pem
-  filename = "win_key.pem"
+  filename = "files/win_key.pem"
 }
 
 resource "aws_key_pair" "key" {

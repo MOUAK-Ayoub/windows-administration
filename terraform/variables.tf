@@ -23,13 +23,17 @@ variable "external-ip" {
   default = "0.0.0.0/0"
 }
 
-variable "instance-type" {
+variable "master-instance-type" {
   type    = string
   default = "t3.medium"
 }
 
+variable "slave-instance-type" {
+  type    = string
+  default = "t3.small"
+}
 variable "instance-count" {
   type    = number
-  default = "3"
+  default = "2"
 }
 
