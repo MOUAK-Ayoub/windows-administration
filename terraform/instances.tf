@@ -4,9 +4,28 @@ data "aws_ssm_parameter" "ami-windows-server-2019" {
 
 data "template_file" "master-user-data" {
   template = file("./files/install_ad.ps1")
+  vars = {
+    domain_name = "${var.domain-name}"
+    pwd         = "${var.pwd}"
+    ad_user = jsonencode(
+      "${var.ad-user}"
+    )
+
+  }
 }
+
 data "template_file" "slave-user-data" {
+  count    = var.instance-count
   template = file("./files/script_on_launch.ps1")
+  vars = {
+    slave_number = "${count.index + 1}"
+    domain_name  = "${var.domain-name}"
+    logon_name   = "${var.ad-user[count.index].logon_name}"
+    pwd          = "${var.ad-user[count.index].pwd}"
+
+    master_private_ip = "${aws_instance.master.private_ip}"
+
+  }
 }
 
 resource "aws_instance" "master" {
@@ -39,15 +58,8 @@ resource "aws_instance" "slave" {
 
   vpc_security_group_ids = [aws_security_group.allow_windows_rdp.id]
   subnet_id              = aws_subnet.subnet-main.id
-  /*
-    user_data                   = <<EOF
-                        <powershell>
-                    Rename-Computer -NewName "computer-1" -Force -Restart
-                        </powershell>
-                      EOF
-  */
 
-  user_data = data.template_file.slave-user-data.rendered
+  user_data = data.template_file.slave-user-data[count.index].rendered
 
   associate_public_ip_address = true
   count                       = var.instance-count
@@ -55,6 +67,6 @@ resource "aws_instance" "slave" {
     Name = "Slave-${count.index + 1}"
   }
 
-  depends_on = [aws_main_route_table_association.vpc_route_asso]
+  depends_on = [aws_main_route_table_association.vpc_route_asso, aws_instance.master]
 
 }

@@ -20,6 +20,16 @@ resource "aws_security_group_rule" "allow_inbound_windows_rdp" {
 
 }
 
+resource "aws_security_group_rule" "allow_inbound_from_same_sg" {
+  type                     = "ingress"
+  security_group_id        = aws_security_group.allow_windows_rdp.id
+  source_security_group_id = aws_security_group.allow_windows_rdp.id
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+
+}
+
 resource "aws_security_group_rule" "allow_outbound_windows" {
   type              = "egress"
   security_group_id = aws_security_group.allow_windows_rdp.id

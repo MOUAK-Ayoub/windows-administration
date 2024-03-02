@@ -2,3 +2,5 @@ terraform/.terraform/*
 .gitignore
 terraform/.terraform.lock.hcl
 terraform/files/win_key.pem
+/terraform/venv/
+/terraform/.idea/
