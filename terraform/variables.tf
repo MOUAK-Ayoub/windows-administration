@@ -64,3 +64,13 @@ variable "ad-user" {
   }]
 
 }
+
+variable "parent-ou" {
+  type    = string
+  default = "developers"
+}
+variable "ou-list" {
+  type    = list(string)
+  default = ["developers-client1", "developers-client2"]
+
+}

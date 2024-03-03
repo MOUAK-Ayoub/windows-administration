@@ -1,0 +1,16 @@
+# Powershell command to get firewall status on a port (here port=80)
+Get-NetFirewallPortFilter |
+     Where-Object { $_.LocalPort -eq 80 } |
+     Get-NetFirewallRule -PolicyStore ActiveStore
+
+- Security groups are not sufficient to open  a port , the port must be open on Windows firewall also
+- Unlike, when using amazon linux 2, where iptables are not installed
+
+
+# Get Dns settings
+Get-DnsClientServerAddress
+
+# To remove OUs
+Get-ADOrganizationalUnit -identity "OU=developers-client1,OU=developers,DC=mathai,DC=local" | Set-ADObject -ProtectedFromAccidentalDeletion:$false -PassThru | Remove-ADOrganizationalUnit -Confirm:$false
+
+# To get the full identity path for AD object, use in server manager/tools/ADSI edit
