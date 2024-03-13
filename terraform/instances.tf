@@ -1,5 +1,5 @@
 data "aws_ssm_parameter" "ami-windows-server-2019" {
-  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base"
+  name = var.windows-ami-2019
 }
 
 data "template_file" "master-user-data" {
@@ -15,7 +15,7 @@ data "template_file" "master-user-data" {
 }
 
 data "template_file" "slave-user-data" {
-  count    = var.instance-count
+  count    = var.slave-instance.count
   template = file("./files/script_on_launch.ps1")
   vars = {
     slave_number = "${count.index + 1}"
@@ -50,9 +50,10 @@ resource "aws_instance" "master" {
 
 
 resource "aws_instance" "slave" {
+  count = var.slave-instance.count
 
   ami           = data.aws_ssm_parameter.ami-windows-server-2019.value
-  instance_type = var.slave-instance-type
+  instance_type = var.slave-instance.type
 
   key_name = aws_key_pair.key.key_name
 
@@ -62,9 +63,8 @@ resource "aws_instance" "slave" {
   user_data = data.template_file.slave-user-data[count.index].rendered
 
   associate_public_ip_address = true
-  count                       = var.instance-count
   tags = {
-    Name = "Slave-${count.index + 1}"
+    Name = "${var.slave-instance.tag_name}-${count.index + 1}"
   }
 
   depends_on = [aws_main_route_table_association.vpc_route_asso, aws_instance.master]
