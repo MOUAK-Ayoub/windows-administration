@@ -1,0 +1,68 @@
+#upgrade python to 3.8 ( for this date March 2024)
+sudo yum update -y
+sudo yum groupinstall -y 'Development Tools'
+sudo yum install -y gcc openssl-devel bzip2-devel libffi-devel
+wget https://www.python.org/ftp/python/3.9.6/Python-3.9.6.tar.xz
+tar zxf Python-3.9.6.tgz
+cd Python-3.9.6
+./configure prefix=/usr/local/python3.9
+make
+make install
+ln -s /usr/local/python3.9/bin/python3.9 /usr/bin/python3
+ln -s /usr/local/python3.9/bin/pip3.9 /usr/bin/pip3
+python3 --verion
+pip3 --version
+
+# Install ansible look at contoller.sh from kafka repository
+# install pywinrm 
+pip install "pywinrm>=0.3.0"
+
+# Open winrm http and https (if applied) in windows server
+add in inventory or global config of ansible
+#Example of inventory with winrm configuration
+---------------------------------------------------------------------------------
+
+[all]
+3.87.90.58
+
+[all:vars]
+ansible_user=Administrator
+ansible_password="A%oRHrLoDde?i96bl%t?QKdzgikJS$.8"
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+ansible_port=5985
+ansible_winrm_scheme=http
+ansible_winrm_transport=ntlm
+---------------------------------------------------------------------------------
+#Example in windows
+---
+- name: Actions for all servers
+  hosts: all
+  tasks:
+     - name: Touch a file (creates if not present, updates modification time if present)
+       ansible.windows.win_file:
+         path: C:\Temp\foo.conf
+         state: touch
+-------------------------------------------------------------------------------------------
+NOT SURE IF NECESSARY
+
+#To apply in windows host
+
+winrm get winrm/config/Service
+winrm get winrm/config/Winrs
+Set-Item -Path WSMan:\localhost\Service\Auth\basic -Value $true
+Set-Item -Path WSMan:\localhost\Service\AllowUnencrypted -Value $true
+Set-Item -Path WSMan:\localhost\Service\Auth\CredSSP -Value $true
+
+Set-Item -Path WSMan:\localhost\Service\EnableCompatibilityHttpListener -Value $true
+Set-Item -Path WSMan:\localhost\Service\EnableCompatibilityHttpsListener -Value $true
+
+# also this script from the official ansible page
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$url = "https://raw.githubusercontent.com/jborean93/ansible-windows/master/scripts/Install-WMF3Hotfix.ps1"
+$file = "$env:temp\Install-WMF3Hotfix.ps1"
+
+(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
+powershell.exe -ExecutionPolicy ByPass -File $file -Verbose
+

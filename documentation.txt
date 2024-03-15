@@ -1,16 +1,41 @@
-# Powershell command to get firewall status on a port (here port=80)
-Get-NetFirewallPortFilter |
-     Where-Object { $_.LocalPort -eq 80 } |
-     Get-NetFirewallRule -PolicyStore ActiveStore
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+***NETWORKING COMMAND ON WINDOWS***
+
 
 - Security groups are not sufficient to open  a port , the port must be open on Windows firewall also
 - Unlike, when using amazon linux 2, where iptables are not installed
 
+# Powershell command to get firewall status on a port (here port=80)
+Get-NetFirewallPortFilter |
+     Where-Object { $_.LocalPort -eq 5985 } |
+     Get-NetFirewallRule -PolicyStore ActiveStore
+
+# To test connection to remote host port
+Test-NetConnection 3.87.90.58 -Port 3389
+
 
 # Get Dns settings
 Get-DnsClientServerAddress
+New-NetFirewallRule -DisplayName "Allow winrm 5985 " -Direction Inbound -Action Allow  -Protocol TCP -LocalPort 5985 -RemoteAddress Any
+
+# To test connection over winrm use:
+$user="Administrator"
+$pwd='A%oRHrLoDde?i96bl%t?QKdzgikJS$.8'
+$ip='3.87.90.58'
+winrs -r:$("http://"+$ip+":5985/wsman")  -u:$user -p:$pwd ipconfig
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+***Active Directory on Windows***
+
 
 # To remove OUs
 Get-ADOrganizationalUnit -identity "OU=developers-client1,OU=developers,DC=mathai,DC=local" | Set-ADObject -ProtectedFromAccidentalDeletion:$false -PassThru | Remove-ADOrganizationalUnit -Confirm:$false
 
 # To get the full identity path for AD object, use in server manager/tools/ADSI edit
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+

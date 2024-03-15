@@ -1,9 +1,3 @@
-
-variable "profile" {
-  type    = string
-  default = "default"
-}
-
 variable "aws_access_key" {
   type = string
 }
@@ -12,65 +6,103 @@ variable "aws_secret_key" {
   type = string
 }
 
-
 variable "region" {
   default = "us-east-1"
 }
 
-variable "external-ip" {
-  default = "0.0.0.0/0"
-}
-
-variable "master-instance-type" {
-  default = "t3.medium"
-}
-
-variable "slave-instance-type" {
-  default = "t3.small"
-}
-variable "instance-count" {
+variable "az-number" {
   type    = number
   default = 2
 }
 
-variable "domain-name" {
-  type    = string
-  default = "mathai.local"
+variable "vpc-cidr" {
+  default = "10.0.0.0/16"
 }
 
-variable "pwd" {
-  type    = string
-  default = "Test2024!"
+variable "newbits" {
+  type        = number
+  default     = 8
+  description = "Look at the terraform function cidrsubnet, newbits is the second parameter"
 }
 
-variable "ad-user" {
-  type = list(object({
-    firstname  = string
-    lastname   = string
-    logon_name = string
-    pwd        = string
+variable "subnet-number" {
+  type    = number
+  default = 3
+}
+
+variable "windows-ami" {
+  default = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base"
+}
+
+
+variable "instances" {
+  type = map(object({
+    type           = string,
+    tag_name       = string
+    instance_count = number
   }))
-  default = [{
-    firstname  = "imane"
-    lastname   = "azirar"
-    logon_name = "iazirar"
-    pwd        = "Test2024!"
-    }, {
-    firstname  = "ayoub"
-    lastname   = "mouak"
-    logon_name = "amouak"
-    pwd        = "Test2024!"
-
-  }]
-
+  default = {
+    "master" = {
+      type           = "t3.medium"
+      tag_name       = "Domain Controller"
+      instance_count = 1
+    },
+    "slave" = {
+      type           = "t3.small"
+      tag_name       = "laptop"
+      instance_count = 2
+    }
+  }
 }
 
-variable "parent-ou" {
-  type    = string
-  default = "developers"
-}
-variable "ou-list" {
-  type    = list(string)
-  default = ["developers-client1", "developers-client2"]
 
+variable "windows-sg-rules" {
+  type = map(object({
+    type                     = string,
+    from_port                = number,
+    to_port                  = number,
+    protocol                 = string,
+    source_security_group_id = optional(string),
+    source_cidr_ip           = optional(list(string))
+  }))
+  default = {
+    "allow_rdp" = {
+      type           = "ingress"
+      from_port      = 3389
+      to_port        = 3389,
+      protocol       = "tcp",
+      source_cidr_ip = ["0.0.0.0/0"]
+
+      }, "allow_winrm_http" = {
+      type           = "ingress"
+      from_port      = 5985
+      to_port        = 5985,
+      protocol       = "tcp",
+      source_cidr_ip = ["0.0.0.0/0"]
+
+      }, "allow_winrm_https" = {
+      type           = "ingress"
+      from_port      = 5986
+      to_port        = 5986,
+      protocol       = "tcp",
+      source_cidr_ip = ["0.0.0.0/0"]
+
+      }, "allow_all_from_same_sg" = {
+      type                     = "ingress"
+      from_port                = 0
+      to_port                  = 0,
+      protocol                 = "-1",
+      source_security_group_id = "sg",
+
+      }, "allow_all_egress" = {
+      type           = "egress"
+      from_port      = 0
+      to_port        = 0,
+      protocol       = "-1",
+      source_cidr_ip = ["0.0.0.0/0"]
+    }
+  }
 }
+
+
+

@@ -28,4 +28,4 @@ aws iam create-access-key --user-name terraform
 
 echo " Create bucket: "
 
-aws s3api create-bucket --bucket terraformstatefile2022
+aws s3api create-bucket --bucket terraformstatefile2024
