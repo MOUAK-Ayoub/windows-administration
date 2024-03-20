@@ -1,4 +1,20 @@
 # Create users
+# Create Oraganizational unit
+
+$Parent = "developers"
+$OUs = @(
+"developers-client1",
+"developers-client2"
+)
+New-ADOrganizationalUnit -Name $Parent  –Description “A container for all developers in the company”
+# returns DC=mathai,DC=local if domain_name=mathai.local
+$DomainDN = (Get-ADDomain).DistinguishedName
+$ParentOU = "OU=" + $Parent + "," + $DomainDN
+ForEach ($OU In $OUs)
+{
+    New-ADOrganizationalUnit -Name $OU -Path $ParentOU –Description “A container for  developers for this specific client”
+}
+
 
 $AdUser = @'
 [
@@ -30,21 +46,6 @@ foreach ($elem in $AdUsersList)
 
 }
 
-# Create Oraganizational unit
-
-$Parent = "developers"
-$OUs = @(
-"developers-client1",
-"developers-client2"
-)
-New-ADOrganizationalUnit -Name $Parent  –Description “A container for all developers in the company”
-# returns DC=mathai,DC=local if domain_name=mathai.local
-$DomainDN = (Get-ADDomain).DistinguishedName
-$ParentOU = "OU=" + $Parent + "," + $DomainDN
-ForEach ($OU In $OUs)
-{
-    New-ADOrganizationalUnit -Name $OU -Path $ParentOU –Description “A container for  developers for this specific client”
-}
 
 # Move computers to ous
 $ComputersOu = @'

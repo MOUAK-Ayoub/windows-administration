@@ -1,0 +1,10 @@
+[all]
+10.0.1.225
+
+[all:vars]
+ansible_user=ansible
+ansible_password=Test2024!
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_port=5985
+ansible_winrm_scheme=http

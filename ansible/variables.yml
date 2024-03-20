@@ -1,0 +1,7 @@
+---
+domain_name: mathai.local
+recovery_password: Test2024!
+parent_ou: Developers
+child_ous:
+  - developers-client1
+  - developers-client2
