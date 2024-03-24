@@ -1,0 +1,29 @@
+---
+- name: Add active directory users and Organizational units
+  hosts: domain_computers
+  vars_files:
+    - variables.yml
+    - var_ad_users.json
+  tasks:
+
+    - name: Configure DC ip as DNS server for computer the domain
+      ansible.windows.win_dns_client:
+        adapter_names: 'Ethernet*'
+        dns_servers: "{{ domain_controller.domain_ip }}"
+
+    - ansible.windows.win_domain_membership:
+        dns_domain_name: "{{ domain_controller.domain_name }}"
+        hostname: "{{ item.computer }}"
+        domain_admin_user: "{{ domain_controller.domain_name }}\\{{ item.logon_name }}"
+        domain_admin_password: "{{ item.pwd }}"
+        domain_ou_path: "OU={{ item.ou }},OU={{ parent_ou }},{{domain_controller.domain_distinguished_name}}"
+        state: domain
+      loop: "{{users}}"
+      when: item.computer == hostname
+      register: domain_state
+
+    - name: reboot server
+      win_reboot:
+        msg: "Joining computer to domain. Rebooting..."
+      when: domain_state.changed
+

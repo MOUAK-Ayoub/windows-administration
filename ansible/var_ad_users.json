@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "firstname": "imane",
+      "lastname": "imane",
+      "logon_name": "iimane",
+      "pwd": "Test2024!",
+      "ou": "developers-client1",
+      "computer": "COMPUTER-1"
+    },
+    {
+      "firstname": "ayoub",
+      "lastname": "ayoub",
+      "logon_name": "aayoub",
+      "pwd": "Test2024!",
+      "ou": "developers-client2",
+      "computer": "COMPUTER-2"
+    }
+  ]
+}

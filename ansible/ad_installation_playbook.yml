@@ -1,6 +1,6 @@
 ---
-- name: variable precedence test
-  hosts: all
+- name: Installation of active directory
+  hosts: domain_controller
   vars_files:
     - "variables.yml"
   tasks:
@@ -13,7 +13,7 @@
       register: result
     - name: Create Domain
       win_domain:
-        dns_domain_name: '{{ domain_name }}'
+        dns_domain_name: '{{ domain_controller.domain_name }}'
         safe_mode_password: '{{ recovery_password }}'
       register: ad
     - name: reboot server
@@ -21,15 +21,4 @@
         msg: "Installing AD. Rebooting..."
         post_reboot_delay: 120
       when: ad.changed
-
-    - name: Create parent OU
-      microsoft.ad.ou:
-        name: '{{ parent_ou }}'
-        state: present
-    - name: Create child OUs
-      microsoft.ad.ou:
-        name: "{{ item }}"
-        path: DC=euc,DC=vmware,DC=lan
-        state: present
-        loop: "{{ child_ous }}"
 

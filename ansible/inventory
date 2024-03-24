@@ -1,5 +1,15 @@
 [all]
-10.0.1.225
+10.0.1.48 hostname=DC
+10.0.1.252 hostname=COMPUTER-1
+10.0.1.40 hostname=COMPUTER-2
+
+[domain_controller]
+10.0.1.48
+
+[domain_computers]
+10.0.1.252 hostname=COMPUTER-1
+10.0.1.40 hostname=COMPUTER-2
+
 
 [all:vars]
 ansible_user=ansible
@@ -8,3 +18,5 @@ ansible_connection=winrm
 ansible_winrm_transport=basic
 ansible_port=5985
 ansible_winrm_scheme=http
+
+

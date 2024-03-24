@@ -1,0 +1,41 @@
+---
+- name: Add active directory users and Organizational units
+  hosts: domain_controller
+  vars_files:
+    - variables.yml
+    - var_ad_users.json
+  tasks:
+    - name: register domain
+      win_shell: (Get-ADDomain).DistinguishedName
+      register: domain_command
+
+    - set_fact:
+        domain_detailed={{ domain_command.stdout }}
+
+    - name: Create parent OU
+      microsoft.ad.ou:
+        name: "{{ parent_ou }}"
+        state: present
+    - name: Create child OUs
+      microsoft.ad.ou:
+        name: "{{ item }}"
+        path: "OU={{ parent_ou }},{{domain_detailed}}"
+        state: present
+      loop: "{{ child_ous }}"
+
+    - name: debug json read
+      debug:
+        msg: "{{ users }}"
+
+    - name: Add users from json file
+      microsoft.ad.user:
+
+        name: "{{item.firstname}} {{item.lastname}}"
+        firstname: "{{item.firstname}}"
+        surname: "{{item.lastname}}"
+        upn: "{{item.logon_name}}"
+        sam_account_name : "{{item.logon_name}}"
+        password: "{{item.pwd}}"
+        path: "OU={{ item.ou }},OU={{ parent_ou }},{{domain_detailed}}"
+        state: present
+      loop: "{{users}}"

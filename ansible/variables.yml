@@ -1,7 +1,11 @@
 ---
-domain_name: mathai.local
+domain_controller:
+    domain_name: mathai.local
+    domain_distinguished_name: DC=mathai,DC=local
+    domain_ip: 10.0.1.48
 recovery_password: Test2024!
 parent_ou: Developers
 child_ous:
   - developers-client1
   - developers-client2
+
